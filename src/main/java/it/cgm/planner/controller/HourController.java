@@ -54,7 +54,7 @@ public class HourController {
 	//role: admin, user
 	//get all hours
 	@GetMapping("/findAll")
-    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
 	@ResponseBody
 	public ResponseEntity<ApiResponse> findAllHours(HttpServletRequest request) {	
 
@@ -75,7 +75,7 @@ public class HourController {
 		//role: admin, user
 		//get hour by id
 		@GetMapping("/byId/{id}")
-	    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+	    @PreAuthorize("hasRole('ADMIN')")
 		public ResponseEntity<ApiResponse> findHourById(@PathVariable Long id,HttpServletRequest request) {
 			
 			String error = null;
@@ -96,7 +96,7 @@ public class HourController {
 		//role: admin, user
 		//insert a group
 		@PostMapping("/insert")
-		@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+		@PreAuthorize("hasRole('ADMIN')")
 		public ResponseEntity<ApiResponse> saveDay(@Valid @RequestBody HourRequest hourRequest, HttpServletRequest request) {
   
 				Hour hour = new Hour();
@@ -110,7 +110,7 @@ public class HourController {
 		//role: admin, user
 		//insert a hour
 		@PutMapping("/saveHour")
-		@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+	    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 		public ResponseEntity<ApiResponse> saveHour(@Valid @RequestBody HourRequest hourRequest,HttpServletRequest request) {
 			
 		Optional<Hour> hourId = hourRepository.findById(hourRequest.getIdHour());
@@ -159,7 +159,7 @@ public class HourController {
 		//role: admin, user
 		//delete all
 		@DeleteMapping("/delete")
-		@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+	    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 		public ResponseEntity<ApiResponse> delete(HttpServletRequest request) {
 					
 			 	hourRepository.deleteAll();

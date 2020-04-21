@@ -1,8 +1,16 @@
 package it.cgm.planner.model;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
@@ -32,6 +40,12 @@ public class UserStudent  {
     @Size(max = 65)
     private String username;
 
+    @OneToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "users_student_grade",
+	            joinColumns = @JoinColumn(name = "users_student_id"),
+	            inverseJoinColumns = @JoinColumn(name = "grade_id"))
+	 
+    private Set<Grade> grades = new HashSet<>();
     
 	public UserStudent() {
 	}
@@ -43,6 +57,7 @@ public class UserStudent  {
 		this.lastname = lastname;
 		this.username = username;
 	}
+
 
 	public Long getId() {
         return id;
@@ -76,6 +91,33 @@ public class UserStudent  {
         this.name = name;
     }
 
-    
+	public Set<Grade> getGrades() {
+		return grades;
+	}
+
+	public void setGrades(Set<Grade> grades) {
+		this.grades = grades;
+	}
+
+	//method for add grade in a set 
+	public void setGradesAdd(Grade grade) {
+		grades.add(grade);
+		 }
+	//method for add collection of grade in a set
+	public void setGradeAddCollection(Set<Grade> grade) {
+		grades.addAll(grade);
+	 }
+	//method for delete grade in a set 
+	public void setGradeDel(Grade grade) {
+		grades.remove(grade);
+	 }
+	//method for delete all hours  in a set 
+	public void setGradeDelCollection() {
+		grades.removeAll(grades);
+	 }
+	//method for add List of grade in a set
+	public void setGradeAddCollection(List<Grade> grade) {
+		grades.addAll(grade);
+	 }
 }
 

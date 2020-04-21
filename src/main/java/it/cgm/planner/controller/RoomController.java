@@ -35,7 +35,7 @@ public class RoomController {
 	//role: admin, user
 	//get all groups
 	@GetMapping("/findAll")
-    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
 	@ResponseBody
 	public ResponseEntity<ApiResponse> findAllGroups(HttpServletRequest request) {	
 
@@ -55,7 +55,7 @@ public class RoomController {
 	//role: admin, user
 	//get group by id
 	@GetMapping("/byId/{id}")
-    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse> findGroupById(@PathVariable Long id,HttpServletRequest request) {
 		String error = null;
 		Optional<Room> room = null;
@@ -73,7 +73,7 @@ public class RoomController {
 	//role: admin, user
 	//insert a room
 	@PostMapping("/insert")
-	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse> saveGroups(@Valid @RequestBody Room room,HttpServletRequest request) {
 		
 		//check if the name of group is already used
@@ -94,7 +94,7 @@ public class RoomController {
 	
 	//role: admin, user
 	@DeleteMapping("/deleteById/{id}")
-	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@ResponseBody
 	 public ResponseEntity<ApiResponse> deleteGroupById(@PathVariable Long id, HttpServletRequest request) {
 		

@@ -34,7 +34,7 @@ public class ArgumentController {
 	// role: admin, user
 	//get all argument  
 	@GetMapping("/findAll") 
-    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 	@ResponseBody
 	public ResponseEntity<ApiResponse> findAllArguments(HttpServletRequest request) {	
 
@@ -53,6 +53,7 @@ public class ArgumentController {
 	//role: admin, user
 	//get all argument valid
 	@GetMapping("/findAllValid") 
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 	@ResponseBody
 	public  ResponseEntity<ApiResponse> findAllArgumentsValid(HttpServletRequest request) {	
 		String error = null;
@@ -69,7 +70,7 @@ public class ArgumentController {
 	//role: admin, user
 	//get argument by id
 	@GetMapping("/byId/{id}")
-    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 	public ResponseEntity<ApiResponse> findById(@PathVariable Long id,HttpServletRequest request) {
 		String error = null;
 		Optional<Argument> argument = null;
@@ -87,7 +88,7 @@ public class ArgumentController {
 	//role: admin, user
 	//insert a new argument
 	@PostMapping("/insert")
-	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse> saveArgument(@RequestBody Argument newArgument,HttpServletRequest request ) {
 		
 		//check if the name of argument is already used
@@ -115,7 +116,7 @@ public class ArgumentController {
 	//role: admin, user
 	//delete a argument
 	@DeleteMapping("/deleteById/{id}")
-	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@ResponseBody
 	 public ResponseEntity<ApiResponse> deleteArgumentById(@PathVariable Long id, HttpServletRequest request) {
 		try {
@@ -133,7 +134,7 @@ public class ArgumentController {
 	//role: admin, user
 	//update a argument
 	@PutMapping("/update/{id}")
-    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
 	public void replaceArgument(@RequestBody Argument newArgument, @PathVariable Long id) {
 	     argumentRepository.findById(id)
 	      .map(argument -> {

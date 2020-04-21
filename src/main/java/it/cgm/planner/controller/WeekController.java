@@ -69,7 +69,7 @@ public class WeekController {
 	//role: admin, user
 	//get all week
 	@GetMapping("/findAll")
-    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 	@ResponseBody
 	public ResponseEntity<ApiResponse> findAllWeeks(HttpServletRequest request) {	
 
@@ -89,7 +89,7 @@ public class WeekController {
 	//role: admin, user
 	//get week by Id
 	@GetMapping("/findById/{id}")
-    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 	@ResponseBody
 	public ResponseEntity<ApiResponse> findById(@PathVariable Long id, HttpServletRequest request) {	
 		Optional<Week> weeks = null;
@@ -108,7 +108,7 @@ public class WeekController {
 	//role: admin, user
 	//insert week
 	@PostMapping("/saveWeek")
-	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 	public ResponseEntity<ApiResponse> saveWeeks(@Valid @RequestBody WeekRequest weekRequest,HttpServletRequest request) {
 		
 		//weekBasic is an entity week in which days and hours are already present inside, we will use it to create new weeks starting from that
@@ -200,7 +200,7 @@ public class WeekController {
 	//role: admin, user
 	//complete a week
 	@PutMapping("/completeWeek")
-	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 	public ResponseEntity<ApiResponse> completeWeek(@Valid @RequestBody WeekRequest weekRequest,HttpServletRequest request) {
 			
 			//select a week to complete
@@ -261,7 +261,7 @@ public class WeekController {
 		//role: admin, user
 		//delete all weeks
 		@DeleteMapping("/delete")
-		@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+	    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 		public ResponseEntity<ApiResponse> delete(HttpServletRequest request) {
 					
 			 	weekRepository.deleteAll();

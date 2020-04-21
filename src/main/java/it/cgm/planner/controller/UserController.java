@@ -61,6 +61,7 @@ public class UserController {
 
     //check if username is valid 
     @GetMapping("/user/checkUsernameAvailability")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> checkUsernameAvailability(@RequestParam(value = "username") String username, HttpServletRequest request) {
     	String error = null;
     	Boolean isAvailable = null;
@@ -76,6 +77,7 @@ public class UserController {
     
     //check if email is valid 
     @GetMapping("/user/checkEmailAvailability")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> checkEmailAvailability(@RequestParam(value = "email") String email, HttpServletRequest request) {
     	String error = null;
     	Boolean isAvailable = null;
@@ -91,7 +93,7 @@ public class UserController {
 
     //get user profile whit username
     @GetMapping("/users/{username}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> getUserProfile(@PathVariable(value = "username") String username, HttpServletRequest request) {
     	String error = null;
     	 UserProfile userProfile = null;
@@ -135,7 +137,7 @@ public class UserController {
   
     //get user by role
     @GetMapping("/user/role")
-    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> getUserByRole(@RequestParam(value = "roleName") RoleName roleName, HttpServletRequest request){
     	String error = null;
     	
@@ -166,7 +168,7 @@ public class UserController {
     
     //get all user students
     @GetMapping("/usersStudent")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
     public ResponseEntity<ApiResponse> getAllUsersStudent(HttpServletRequest request) {
     	
     	String error = null;
@@ -183,5 +185,6 @@ public class UserController {
     	  
     }
 
+    
 
 }

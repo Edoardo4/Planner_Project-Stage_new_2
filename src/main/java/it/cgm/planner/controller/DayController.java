@@ -46,7 +46,7 @@ public class DayController {
 	//role: admin, user
 	//get all day
 	@GetMapping("/findAll")
-    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
 	@ResponseBody
 	public ResponseEntity<ApiResponse> findAllDays(HttpServletRequest request) {	
 
@@ -66,7 +66,7 @@ public class DayController {
 	//role: admin, user
 	//get day by id
 	@GetMapping("/byId/{id}")
-    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse> findDayById(@PathVariable Long id,HttpServletRequest request) {
 		
 		String error = null;
@@ -87,7 +87,7 @@ public class DayController {
 	//role: admin, user
 	//insert a group
 	@PostMapping("/insert")
-	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 	public ResponseEntity<ApiResponse> saveDay(@Valid @RequestBody DayRequest dayRequest,HttpServletRequest request) {
 		
 		//check if the name of group is already used
@@ -140,7 +140,7 @@ public class DayController {
 		//role: admin, user
 		//delete a hour
 		@PutMapping("/deleteHourInDay")
-		@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+	    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 		public ResponseEntity<ApiResponse> deleteHourInDay(@Valid @RequestBody DayRequest dayRequest,HttpServletRequest request) {
 			
 		Optional<Day> days = dayRepository.findById(dayRequest.getIdDay());
@@ -165,7 +165,7 @@ public class DayController {
 		//role: admin, user
 		//delete day
 		@DeleteMapping("/deleteDay/{id}")
-	    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+	    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 		@ResponseBody
 		public ResponseEntity<ApiResponse> deleteDay(@PathVariable Long id, HttpServletRequest request) {	
 			try {
@@ -183,7 +183,7 @@ public class DayController {
 		//role: admin, user
 		//delete all
 		@DeleteMapping("/delete")
-		@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+	    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 		public ResponseEntity<ApiResponse> delete(HttpServletRequest request) {
 					
 			 	dayRepository.deleteAll();

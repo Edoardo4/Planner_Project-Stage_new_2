@@ -45,7 +45,7 @@ public class GroupController {
 	//role: admin, user
 	//get all groups
 	@GetMapping("/findAll")
-    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 	@ResponseBody
 	public ResponseEntity<ApiResponse> findAllGroups(HttpServletRequest request) {	
 
@@ -63,66 +63,67 @@ public class GroupController {
 	
 	//role: admin, user
 	//get all groups
-		@GetMapping("/findAllValid") //add , produces = MediaType.A
-		@ResponseBody
-		public  ResponseEntity<ApiResponse> findAllGroupsValid(HttpServletRequest request) {	
-			String error = null;
-			List<Group> list = new ArrayList<Group>();
-			try {
-				list =groupRepository.findByisValidTrueOrderByName();
-			}catch (Exception e) {
-				error = e.getMessage();
-	    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error, list,  request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);		
-	    		}
-			return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, list, request.getRequestURI()), HttpStatus.OK);
-		}
+	@GetMapping("/findAllValid") //add , produces = MediaType.A
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
+	@ResponseBody
+	public  ResponseEntity<ApiResponse> findAllGroupsValid(HttpServletRequest request) {	
+		String error = null;
+		List<Group> list = new ArrayList<Group>();
+		try {
+			list =groupRepository.findByisValidTrueOrderByName();
+		}catch (Exception e) {
+			error = e.getMessage();
+    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error, list,  request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);		
+    		}
+		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, list, request.getRequestURI()), HttpStatus.OK);
+	}
 	
 
-		//role: admin, user
-		//get group by id
-		@GetMapping("/byId/{id}")
-	    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
-		public ResponseEntity<ApiResponse> findGroupById(@PathVariable Long id,HttpServletRequest request) {
-			String error = null;
-			Optional<Group> group = null;
-			try {
-				group = groupRepository.findById(id);
-			}catch (Exception e) {
-				
-				error = e.getMessage();
-	    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error, group,  request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
-			}
+	//role: admin, user
+	//get group by id
+	@GetMapping("/byId/{id}")
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
+	public ResponseEntity<ApiResponse> findGroupById(@PathVariable Long id,HttpServletRequest request) {
+		String error = null;
+		Optional<Group> group = null;
+		try {
+			group = groupRepository.findById(id);
+		}catch (Exception e) {
 			
-			return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, group, request.getRequestURI()), HttpStatus.OK);
+			error = e.getMessage();
+    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error, group,  request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		//role: admin, user
-		//insert a group
-		@PostMapping("/insert")
-		@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-		public ResponseEntity<ApiResponse> saveGroups(@Valid @RequestBody GroupRequest groupRequest,HttpServletRequest request) {
-			
-			//check if the name of group is already used
-			 if(groupRepository.existsByName(groupRequest.getName())) {
-		        	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
-		        			HttpStatus.BAD_REQUEST.value(), null, "Name already in use!", request.getRequestURI()), HttpStatus.BAD_REQUEST);
-			 }
-			    
-				Group group = new Group();
-				group.setName(groupRequest.getName());
-				group.setValid(groupRequest.isValid());
-				
-			 				
-			 groupRepository.save(group);
-			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
-		        		HttpStatus.OK.value(), null, "Group successfully", request.getRequestURI()), HttpStatus.OK);	
-			 }
+		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, group, request.getRequestURI()), HttpStatus.OK);
+	}
 		
+	//role: admin, user
+	//insert a group
+	@PostMapping("/insert")
+    @PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<ApiResponse> saveGroups(@Valid @RequestBody GroupRequest groupRequest,HttpServletRequest request) {
+		
+		//check if the name of group is already used
+		 if(groupRepository.existsByName(groupRequest.getName())) {
+	        	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+	        			HttpStatus.BAD_REQUEST.value(), null, "Name already in use!", request.getRequestURI()), HttpStatus.BAD_REQUEST);
+		 }
+		    
+			Group group = new Group();
+			group.setName(groupRequest.getName());
+			group.setValid(groupRequest.isValid());
+			
+		 				
+		 groupRepository.save(group);
+		 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+	        		HttpStatus.OK.value(), null, "Group successfully", request.getRequestURI()), HttpStatus.OK);	
+		 }
+	
 		  
 		
 		//role: admin, user
 		@DeleteMapping("/deleteById/{id}")
-		@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+	    @PreAuthorize("hasRole('ADMIN')")
 		@ResponseBody
 		 public ResponseEntity<ApiResponse> deleteGroupById(@PathVariable Long id, HttpServletRequest request) {
 			
@@ -139,7 +140,7 @@ public class GroupController {
 		
 		//add user student in a group
 		@PutMapping("/update/insertUserGroup")
-	    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+	    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 		public ResponseEntity<ApiResponse> replaceGroupAddUser(@Valid @RequestBody AddDelGroup addDelGroup ,HttpServletRequest request) {
 
 			int numberOfInsertions = 0;
@@ -214,7 +215,7 @@ public class GroupController {
 		
 		//delete user student in a group
 		@PutMapping("/update/deleteUserGroup")
-	    @PreAuthorize("hasRole('ADMIN') or harRole('USER')")
+	    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 		public ResponseEntity<ApiResponse> replaceGroupDelUser(@Valid @RequestBody AddDelGroup addDelGroup ,HttpServletRequest request) {
 			
 			int numberOfUserRemoved = 0;
