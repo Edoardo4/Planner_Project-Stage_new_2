@@ -41,6 +41,13 @@ public class UserStudent  {
     private String username;
 
     @OneToMany(fetch = FetchType.EAGER)
+  	@JoinTable(name = "users_student_exam",
+  	            joinColumns = @JoinColumn(name = "users_student_id"),
+  	            inverseJoinColumns = @JoinColumn(name = "exam_id"))
+  	 
+      private Set<Exam> exams = new HashSet<>();
+    
+    @OneToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "users_student_grade",
 	            joinColumns = @JoinColumn(name = "users_student_id"),
 	            inverseJoinColumns = @JoinColumn(name = "grade_id"))
@@ -91,6 +98,14 @@ public class UserStudent  {
         this.name = name;
     }
 
+	public Set<Exam> getExams() {
+		return exams;
+	}
+
+	public void setExams(Set<Exam> exams) {
+		this.exams = exams;
+	}
+
 	public Set<Grade> getGrades() {
 		return grades;
 	}
@@ -99,6 +114,30 @@ public class UserStudent  {
 		this.grades = grades;
 	}
 
+	
+	//method for add exam in a set 
+	public void setExamAdd(Exam exam) {
+		exams.add(exam);
+		 }
+	//method for add collection of exam in a set
+	public void setExamAddCollection(Set<Exam> exam) {
+		exams.addAll(exam);
+	 }
+	//method for delete exam in a set 
+	public void setExamDel(Exam exam) {
+		exams.remove(exam);
+	 }
+	//method for delete all exam  in a set 
+	public void setExamDelCollection() {
+		exams.removeAll(exams);
+	 }
+	//method for add List of exam in a set
+	public void ListExamAddCollection(List<Exam> exam) {
+		exams.addAll(exam);
+	 }
+		
+	
+	
 	//method for add grade in a set 
 	public void setGradesAdd(Grade grade) {
 		grades.add(grade);
@@ -116,7 +155,7 @@ public class UserStudent  {
 		grades.removeAll(grades);
 	 }
 	//method for add List of grade in a set
-	public void setGradeAddCollection(List<Grade> grade) {
+	public void listGradeAddCollection(List<Grade> grade) {
 		grades.addAll(grade);
 	 }
 }

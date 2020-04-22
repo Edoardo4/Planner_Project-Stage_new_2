@@ -24,27 +24,28 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import it.cgm.planner.model.Argument;
-import it.cgm.planner.model.Grade;
+import it.cgm.planner.model.Exam;
 import it.cgm.planner.model.UserStudent;
 import it.cgm.planner.payload.ApiResponse;
-import it.cgm.planner.payload.GradeRequest;
+import it.cgm.planner.payload.ExamRequest;
 import it.cgm.planner.repository.ArgumentRepository;
-import it.cgm.planner.repository.GradeRepository;
+import it.cgm.planner.repository.ExamRepository;
 import it.cgm.planner.repository.UserStudentRepository;
 
 @RestController
-@RequestMapping("/grade")
-public class GradeController {
-	
+@RequestMapping("/exam")
+public class ExamController {
+
+
 	@Autowired
-	private GradeRepository gradeRepository;
-	
+	private ExamRepository examRepository;
+ 
 	@Autowired
 	private ArgumentRepository argumentRepository;
 	
-	 @Autowired
-	 private UserStudentRepository userStudentRepository;
-	 
+	@Autowired
+	private UserStudentRepository userStudentRepository;
+	
 	//role: admin, professor
 	//get all grades
 	@GetMapping("/findAll")
@@ -52,10 +53,10 @@ public class GradeController {
 	@ResponseBody
 	public ResponseEntity<ApiResponse> findAllGroups(HttpServletRequest request) {	
 
-		List<Grade> list = new ArrayList<>();
+		List<Exam> list = new ArrayList<>();
 		String error = null;
 		try {
-			list =gradeRepository.findAll();
+			list =examRepository.findAll();
 			
 		}catch (Exception e) {
 			error = e.getMessage();
@@ -70,122 +71,124 @@ public class GradeController {
     @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 	public ResponseEntity<ApiResponse> findGroupById(@PathVariable Long id,HttpServletRequest request) {
 		String error = null;
-		List<Grade> grade = null;
+		List<Exam> exam = null;
 		Optional<Argument> argument = argumentRepository.findById(id);
 		try {
 			
-			grade = gradeRepository.findByargument(argument);
+			exam = examRepository.findByargument(argument);
 			
 		}catch (Exception e) {
 			
 			error = e.getMessage();
-    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error, grade,  request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
+    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error, exam,  request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, grade, request.getRequestURI()), HttpStatus.OK);
+		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, exam, request.getRequestURI()), HttpStatus.OK);
 	}
 	
 	//role: admin, user
 	//insert a grade
-	@PostMapping("/insertGradeInUserSudent")
+	@PostMapping("/insertExamInUserSudent")
     @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
-	public ResponseEntity<ApiResponse> insertGradeInUserSudent(@Valid @RequestBody GradeRequest gradeRequest,HttpServletRequest request) {
+	public ResponseEntity<ApiResponse> insertExamInUserSudent(@Valid @RequestBody ExamRequest examRequest,HttpServletRequest request) {
 		
-		Optional<UserStudent> userStudent = userStudentRepository.findById(gradeRequest.getIdUserStudent());
+		Optional<UserStudent> userStudent = userStudentRepository.findById(examRequest.getIdUserStudent());
 		//check if userStudent exist
 		 if(userStudent.isEmpty()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "userStudent don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
 		 
-		Optional<Argument> argument = argumentRepository.findById(gradeRequest.getIdArgument());
+		Optional<Argument> argument = argumentRepository.findById(examRequest.getIdArgument());
 		//check if argument exist
 		 if(argument.isEmpty()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "argument don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
 		
-		Grade grade = new Grade();
-		//set argument for a grade
-		grade.setArgument(argument.get());
-		//set vote for a grade
-		grade.setVote(gradeRequest.getVote());
+		Exam exam = new Exam();
 		
-		gradeRepository.save(grade);
+		exam.setArgument(argument.get());
+		exam.setName(examRequest.getName());
+		exam.setContent(examRequest.getContent());
+		exam.setVote(examRequest.getVote());
 		
-		//add a grade in a set in the user student
-		userStudent.get().setGradesAdd(grade);
+		examRepository.save(exam);
+		
+		//add a exam in a set in the user student
+		userStudent.get().setExamAdd(exam);
 		 
 		userStudentRepository.save(userStudent.get());
 		
 		 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
-	        		HttpStatus.OK.value(), null, "Grade successfully", request.getRequestURI()), HttpStatus.OK);	
+	        		HttpStatus.OK.value(), null, "Exam successfully", request.getRequestURI()), HttpStatus.OK);	
 		 }
 	
 	//role: admin, user
-	//delete a one grade
-	@DeleteMapping("/deleteGradeInUserSudent")
+	//delete a one exam
+	@DeleteMapping("/deleteExamInUserSudent")
     @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
-	public ResponseEntity<ApiResponse> deleteGradeInUserSudent(@Valid @RequestBody GradeRequest gradeRequest,HttpServletRequest request) {
+	public ResponseEntity<ApiResponse> deleteExamInUserSudent(@Valid @RequestBody ExamRequest examRequest,HttpServletRequest request) {
 		
-		Optional<UserStudent> userStudent = userStudentRepository.findById(gradeRequest.getIdUserStudent());
+		Optional<UserStudent> userStudent = userStudentRepository.findById(examRequest.getIdUserStudent());
 		//check if userStudent exist
 		 if(userStudent.isEmpty()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "userStudent don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
-		 //for each grade in the user student set, if id grade in user student it's equal as gradeRequest.getIdGrade, deleted
-		 for (Grade gr : userStudent.get().getGrades()) {
-			 if(gr.getId() == gradeRequest.getIdGrade()) {
-				 userStudent.get().setGradeDel(gr);
+		 //for each exam in the user student set, if id exam in user student it's equal as examRequest.getIExam, deleted
+		 for (Exam ex : userStudent.get().getExams()) {
+			 if(ex.getId() == examRequest.getIdExam()) {
+				 userStudent.get().setExamDel(ex);
 				 
 				 userStudentRepository.save(userStudent.get());
 			 }
 		 }
 		 
-		gradeRepository.deleteById(gradeRequest.getIdGrade());
+		examRepository.deleteById(examRequest.getIdExam());
 		
 		 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
-	        		HttpStatus.OK.value(), null, "Grade deleted", request.getRequestURI()), HttpStatus.OK);	
+	        		HttpStatus.OK.value(), null, "Exam deleted", request.getRequestURI()), HttpStatus.OK);	
 		 }
 	
+	
 		//role: admin, user
-		//delete all Grade In student
-		@DeleteMapping("/deleteAllGradesInStudent")
+		//delete all exam In student
+		@DeleteMapping("/deleteAllExamsInStudent")
 	    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
-		public ResponseEntity<ApiResponse> deleteAllGradesInStudent(@Valid @RequestBody GradeRequest gradeRequest,HttpServletRequest request) {
+		public ResponseEntity<ApiResponse> deleteAllExamsInStudent(@Valid @RequestBody ExamRequest examRequest,HttpServletRequest request) {
 					
-			Optional<UserStudent> userStudent = userStudentRepository.findById(gradeRequest.getIdUserStudent());
+			Optional<UserStudent> userStudent = userStudentRepository.findById(examRequest.getIdUserStudent());
 			
 			//check if userStudent exist
 			 if(userStudent.isEmpty()) {
 				 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 		        			HttpStatus.BAD_REQUEST.value(), null, "userStudent don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 			 }
-			 //all grade in user student selected 
-			 Set<Grade> gradesInUserStudent = userStudent.get().getGrades();
-			 //all grades in db
-			 List<Grade> grades = gradeRepository.findAll();
-			 //list of grades to deleted
-			 Set<Grade> gradesToDelete = new HashSet<>();
-			 //for each grade in user student
-			 for(Grade g : gradesInUserStudent) {
-				 //and for each grades in db
-				 for(Grade gs : grades) {
-					 //if the user student grade id matches that grade id
-					 if(g.getId() == gs.getId()) {
-						 //add the general grade in the set to deleted 
-						 gradesToDelete.add(gs);
+			 //all exam in user student selected 
+			 Set<Exam> examInUserStudent = userStudent.get().getExams();
+			 //all exam in db
+			 List<Exam> exams = examRepository.findAll();
+			 //list of exams to deleted
+			 Set<Exam> examsToDelete = new HashSet<>();
+			 //for each exam in user student
+			 for(Exam ex : examInUserStudent) {
+				 //and for each exams in db
+				 for(Exam e : exams) {
+					 //if the user student exam id matches that exam id
+					 if(ex.getId() == e.getId()) {
+						 //add the general exam in the set to deleted 
+						 examsToDelete.add(e);
 					 }
 				 }
 			 }
-			 //delete all grades in user student
-			userStudent.get().setGradeDelCollection();
+			 //delete all exams in user student
+			userStudent.get().setExamDelCollection();
 			
 			userStudentRepository.save(userStudent.get());
-			//delete all grades in the set 
-			for(Grade g : gradesToDelete) {
-				gradeRepository.delete(g);
+			//delete all exams in the set 
+			for(Exam ex : examsToDelete) {
+				examRepository.delete(ex);
 			}		 
 			
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
@@ -199,9 +202,9 @@ public class GradeController {
 		@PreAuthorize("hasRole('ADMIN')")
 		public ResponseEntity<ApiResponse> deleteAll(HttpServletRequest request) {
 					
-			gradeRepository.deleteAll();
+			examRepository.deleteAll();
 			 
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
-		        		HttpStatus.OK.value(), null, "grade deleted", request.getRequestURI()), HttpStatus.OK);	
+		        		HttpStatus.OK.value(), null, "exam deleted", request.getRequestURI()), HttpStatus.OK);	
 		 }
 }

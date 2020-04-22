@@ -23,11 +23,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import it.cgm.planner.model.Argument;
-import it.cgm.planner.model.Grade;
 import it.cgm.planner.model.Material;
-import it.cgm.planner.model.UserStudent;
 import it.cgm.planner.payload.ApiResponse;
-import it.cgm.planner.payload.GradeRequest;
 import it.cgm.planner.payload.MaterialRequest;
 import it.cgm.planner.repository.ArgumentRepository;
 import it.cgm.planner.repository.MaterialRepository;
