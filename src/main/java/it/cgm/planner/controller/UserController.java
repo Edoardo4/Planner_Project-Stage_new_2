@@ -4,9 +4,11 @@ import it.cgm.planner.exception.ResourceNotFoundException;
 import it.cgm.planner.model.Role;
 import it.cgm.planner.model.RoleName;
 import it.cgm.planner.model.User;
+import it.cgm.planner.model.UserProfessor;
 import it.cgm.planner.model.UserStudent;
 import it.cgm.planner.payload.*;
 import it.cgm.planner.repository.RoleRepository;
+import it.cgm.planner.repository.UserProfessorRepository;
 import it.cgm.planner.repository.UserRepository;
 import it.cgm.planner.repository.UserStudentRepository;
 import it.cgm.planner.security.UserPrincipal;
@@ -36,6 +38,9 @@ public class UserController {
     
     @Autowired
     private UserStudentRepository userStudentRepository;
+    
+    @Autowired
+    private UserProfessorRepository userProfessorRepository;
     
     @Autowired
     private RoleRepository roleRepository;
@@ -185,6 +190,24 @@ public class UserController {
     	  
     }
 
-    
+    //get all user students
+    @GetMapping("/usersProfessor")
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
+    public ResponseEntity<ApiResponse> getAllUsersProfessor(HttpServletRequest request) {
+    	
+    	String error = null;
+    	List<UserProfessor> userProfessorList = new ArrayList<UserProfessor>();
+    	
+    	try {
+    		userProfessorList = userProfessorRepository.findAll();
+    	} catch (Exception e) {
+    		error = e.getMessage();
+    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error, userProfessorList, request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+        
+    	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, userProfessorList, request.getRequestURI()), HttpStatus.OK);
+    	  
+    }
+
 
 }
