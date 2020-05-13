@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +108,7 @@ public class WeekController {
 	
 	//role: admin, user
 	//insert week
+	@Transactional
 	@PostMapping("/saveWeek")
     @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
 	public ResponseEntity<ApiResponse> saveWeeks(@Valid @RequestBody WeekRequest weekRequest,HttpServletRequest request) {
@@ -117,7 +119,7 @@ public class WeekController {
 		Optional<Group> group = groupRepository.findById(weekRequest.getIdGroup());
 		
 		//if it already exists we don't create it
-		 if(group.isEmpty()) {
+		 if(!group.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "group don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
@@ -206,28 +208,28 @@ public class WeekController {
 			//select a week to complete
 			Optional<Week> weekToComplete= weekRepository.findById(weekRequest.getIdWeek());
 			//check if week exist
-			if(weekToComplete.isEmpty()) {
+			if(!weekToComplete.isPresent()) {
 				return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "Week don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 			}
 			//select a argument for the Week to complete
 			Optional<Argument> argument = argumentRepository.findById(weekRequest.getIdArgument());
 			//check if argument exist
-			 if(argument.isEmpty()) {
+			 if(!argument.isPresent()) {
 				 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 		        			HttpStatus.BAD_REQUEST.value(), null, "Argument don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 			 }
 			//select a userProfessor for the Week to complete
 			Optional<UserProfessor> userProfessor = userProfessorRepository.findById(weekRequest.getIdUserProfessor());
 			//check if userProfessor exist
-			 if(userProfessor.isEmpty()) {
+			 if(!userProfessor.isPresent()) {
 				 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 		        			HttpStatus.BAD_REQUEST.value(), null, "Professor don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 			 }
 			//select a room for Week to complete
 			 Optional<Room> room= roomRepository.findById(weekRequest.getIdRoom());
 			//check if room exist
-			 if(room.isEmpty()) {
+			 if(!room.isPresent()) {
 				 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 		        			HttpStatus.BAD_REQUEST.value(), null, "Room don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 			 }
@@ -257,7 +259,6 @@ public class WeekController {
 	        		HttpStatus.OK.value(), null, "week successfully", request.getRequestURI()), HttpStatus.OK);	
 			}
 	
-		
 		//role: admin, user
 		//delete all weeks
 		@DeleteMapping("/delete")
@@ -270,7 +271,6 @@ public class WeekController {
 		        		HttpStatus.OK.value(), null, "week deleted", request.getRequestURI()), HttpStatus.OK);	
 			 }
 	
-		
 		//role: admin, user
 		//delete week by id
 		@DeleteMapping("/deleteWeekId/{id}")
@@ -304,6 +304,4 @@ public class WeekController {
 			return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        		HttpStatus.OK.value(), null, "week deleted", request.getRequestURI()), HttpStatus.OK);	
 			}
-			
-	
 }

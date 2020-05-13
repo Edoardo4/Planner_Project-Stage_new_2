@@ -36,7 +36,6 @@ public class Group {
 	@Size(max = 40)
 	private String name;
 	
-
 	@Column(name = "is_valid", nullable = false, columnDefinition = "tinyint(1)")
 	private boolean isValid = true;
 	

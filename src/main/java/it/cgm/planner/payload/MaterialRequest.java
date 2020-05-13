@@ -4,9 +4,9 @@ public class MaterialRequest {
 
 	public Long idArgument;
 	
-	public String nameMaterial;
+	public String realName;
 	
-	public String content;
+	public String serverFile;
 
 	public Long idMaterial;
 	
@@ -18,20 +18,20 @@ public class MaterialRequest {
 		this.idArgument = idArgument;
 	}
 
-	public String getNameMaterial() {
-		return nameMaterial;
+	public String getRealName() {
+		return realName;
 	}
 
-	public void setNameMaterial(String nameMaterial) {
-		this.nameMaterial = nameMaterial;
+	public void setRealName(String realName) {
+		this.realName = realName;
 	}
 
-	public String getContent() {
-		return content;
+	public String getServerFile() {
+		return serverFile;
 	}
 
-	public void setContent(String content) {
-		this.content = content;
+	public void setServerFile(String serverFile) {
+		this.serverFile = serverFile;
 	}
 
 	public Long getIdMaterial() {

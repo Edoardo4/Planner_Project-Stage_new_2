@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,7 @@ import it.cgm.planner.repository.ArgumentRepository;
 import it.cgm.planner.repository.ExamRepository;
 import it.cgm.planner.repository.GroupRepository;
 import it.cgm.planner.repository.UserProfessorRepository;
+import it.cgm.planner.repository.UserRepository;
 
 @RestController
 @RequestMapping("/userProfessor")
@@ -50,6 +52,9 @@ public class UserProfessorController {
 	
 	@Autowired
 	private ExamRepository examRepository;
+	
+	@Autowired
+	private UserRepository userRepository;
 	
 	//get all user students
     @GetMapping("/findAll")
@@ -166,14 +171,14 @@ public class UserProfessorController {
 		
 		Optional<UserProfessor> userProfessor = userProfessorRepository.findByUsername(userProfessorRequest.getUsername());
 		//check if userStudent exist
-		 if(userProfessor.isEmpty()) {
+		 if(!userProfessor.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "userStudent don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
 		 
 		Optional<Group> group = groupRepository.findById(userProfessorRequest.getIdGroup());
 		//check if argument exist
-		 if(group.isEmpty()) {
+		 if(!group.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "group don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
@@ -196,7 +201,7 @@ public class UserProfessorController {
 
 		Optional<UserProfessor> userProfessor = userProfessorRepository.findByUsername(userProfessorRequest.getUsername());
 		//check if userStudent exist
-		 if(userProfessor.isEmpty()) {
+		 if(!userProfessor.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "userStudent don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
@@ -228,14 +233,14 @@ public class UserProfessorController {
 		
 		Optional<UserProfessor> userProfessor = userProfessorRepository.findByUsername(userProfessorRequest.getUsername());
 		//check if userStudent exist
-		 if(userProfessor.isEmpty()) {
+		 if(!userProfessor.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "userStudent don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
 		 
 		Optional<Argument> argument = argumentRepository.findById(userProfessorRequest.getIdArgument());
 		//check if argument exist
-		 if(argument.isEmpty()) {
+		 if(!argument.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "argument don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
@@ -257,7 +262,7 @@ public class UserProfessorController {
 
 		Optional<UserProfessor> userProfessor = userProfessorRepository.findByUsername(userProfessorRequest.getUsername());
 		//check if userStudent exist
-		 if(userProfessor.isEmpty()) {
+		 if(!userProfessor.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "userStudent don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
@@ -287,14 +292,14 @@ public class UserProfessorController {
 		
 		Optional<UserProfessor> userProfessor = userProfessorRepository.findByUsername(userProfessorRequest.getUsername());
 		//check if userStudent exist
-		 if(userProfessor.isEmpty()) {
+		 if(!userProfessor.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "userStudent don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
 		
 		Optional<Argument> argument = argumentRepository.findById(userProfessorRequest.getIdArgument());
 		//check if argument exist
-		 if(argument.isEmpty()) {
+		 if(!argument.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "argument don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
@@ -324,7 +329,7 @@ public class UserProfessorController {
 
 		Optional<UserProfessor> userProfessor = userProfessorRepository.findByUsername(userProfessorRequest.getUsername());
 		//check if userStudent exist
-		 if(userProfessor.isEmpty()) {
+		 if(!userProfessor.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "userStudent don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
@@ -343,6 +348,5 @@ public class UserProfessorController {
 		 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        		HttpStatus.OK.value(), null, "exam in User Professor deleted", request.getRequestURI()), HttpStatus.OK);	
 		 }
-	
-	
+
 }

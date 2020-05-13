@@ -23,12 +23,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import it.cgm.planner.model.Argument;
-import it.cgm.planner.model.Day;
 import it.cgm.planner.model.Hour;
 import it.cgm.planner.model.Room;
 import it.cgm.planner.model.UserProfessor;
 import it.cgm.planner.payload.ApiResponse;
-import it.cgm.planner.payload.DayRequest;
 import it.cgm.planner.payload.HourRequest;
 import it.cgm.planner.repository.ArgumentRepository;
 import it.cgm.planner.repository.HourRepository;
@@ -71,7 +69,6 @@ public class HourController {
 		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, list, request.getRequestURI()), HttpStatus.OK);
 	}
 	
-
 		//role: admin, user
 		//get hour by id
 		@GetMapping("/byId/{id}")
@@ -116,28 +113,28 @@ public class HourController {
 		Optional<Hour> hourId = hourRepository.findById(hourRequest.getIdHour());
 		
 		//check if hour exist
-		 if(hourId.isEmpty()) {
+		 if(!hourId.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "Hour don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
 		 
 		Optional<Argument> argument = argumentRepository.findById(hourRequest.getIdArgument());
 
-		 if(argument.isEmpty()) {
+		 if(!argument.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "Argument don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
 		 
 		Optional<UserProfessor> userProfessor = userProfessorRepository.findById(hourRequest.getIdUserProfessor());
 
-		 if(userProfessor.isEmpty()) {
+		 if(!userProfessor.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "Professor don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
 		 
 		 Optional<Room> room= roomRepository.findById(hourRequest.getIdRoom());
 
-		 if(room.isEmpty()) {
+		 if(!room.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "room don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }

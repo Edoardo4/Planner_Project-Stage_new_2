@@ -162,7 +162,7 @@ public class GroupController {
 		    	   Optional<UserStudent> user = userStudentRepository.findById(id);
 		    	   
 		    	   //check: if user is empty the id received is not valid because don't exist a user whit that id
-		    	   if(user.isEmpty()) {
+		    	   if(!user.isPresent()) {
 		    		    
 		    		   numberOfUserusersNotFound ++;		    		  
 		    		   listOfIdUsersNotFound.add(id);
@@ -171,7 +171,7 @@ public class GroupController {
 						//get a group whit id received of idGroup in addDelGroup 
 			    	   Optional<Group> groupId = groupRepository.findById(addDelGroup.getIdGroup());
 			    	   //check: if user is empty the id received is not valid because don't exist a user whit that id
-						if(groupId.isEmpty()) {
+						if(!groupId.isPresent()) {
 							return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 				        			HttpStatus.BAD_REQUEST.value(), null, "Group don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 						}
@@ -244,14 +244,14 @@ public class GroupController {
 		    	   Optional<UserStudent> user = userStudentRepository.findById(id);
 		    	   
 		    	   //check: if user is empty the id received is not valid because don't exist a user whit that id
-		    	   if(user.isEmpty()) {
+		    	   if(!user.isPresent()) {
 		    		    
 		    		   numberOfUserusersNotFound ++;		    		  
 		    		   listOfIdUsersNotFound.add(id);
 		    		   
 					}else {
 					//check: if user is empty the id received is not valid because don't exist a user whit that id
-					if(groupId.isEmpty()) {
+					if(!groupId.isPresent()) {
 						return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 			        			HttpStatus.BAD_REQUEST.value(), null, "Group don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 					}

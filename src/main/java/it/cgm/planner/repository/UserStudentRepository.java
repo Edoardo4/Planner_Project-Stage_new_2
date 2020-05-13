@@ -9,5 +9,6 @@ import it.cgm.planner.model.UserStudent;
 
 public interface UserStudentRepository extends JpaRepository<UserStudent, Long> {
 
+    Optional<UserStudent> findByUsername(String username);
 
 }

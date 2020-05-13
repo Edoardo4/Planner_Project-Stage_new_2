@@ -16,11 +16,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Table(name = "weeks")
@@ -58,8 +53,7 @@ public class Week {
 	public void setName(WeekName name) {
 		this.name = name;
 	}
-
-
+	
 	public String getGroup() {
 		return group;
 	}

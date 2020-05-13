@@ -93,14 +93,14 @@ public class GradeController {
 		
 		Optional<UserStudent> userStudent = userStudentRepository.findById(gradeRequest.getIdUserStudent());
 		//check if userStudent exist
-		 if(userStudent.isEmpty()) {
+		 if(!userStudent.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "userStudent don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
 		 
 		Optional<Argument> argument = argumentRepository.findById(gradeRequest.getIdArgument());
 		//check if argument exist
-		 if(argument.isEmpty()) {
+		 if(!argument.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "argument don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
@@ -130,7 +130,7 @@ public class GradeController {
 		
 		Optional<UserStudent> userStudent = userStudentRepository.findById(gradeRequest.getIdUserStudent());
 		//check if userStudent exist
-		 if(userStudent.isEmpty()) {
+		 if(!userStudent.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "userStudent don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
@@ -158,7 +158,7 @@ public class GradeController {
 			Optional<UserStudent> userStudent = userStudentRepository.findById(gradeRequest.getIdUserStudent());
 			
 			//check if userStudent exist
-			 if(userStudent.isEmpty()) {
+			 if(!userStudent.isPresent()) {
 				 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 		        			HttpStatus.BAD_REQUEST.value(), null, "userStudent don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 			 }

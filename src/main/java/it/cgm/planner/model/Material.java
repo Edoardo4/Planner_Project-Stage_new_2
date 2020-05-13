@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+//ogni material andrà in una folder, ogni professore avrà la sua
 @Entity
 @Table(name = "material")
 public class Material {
@@ -17,16 +18,18 @@ public class Material {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
-	@Column(name="name")
 	
+	//name that the professor assigns
+	@Column(name="realName")
 	@NotNull @NotBlank
 	@Size(max = 40)
-	private String name;
+	private String realName;
 	
-	@Column(name="content")
+	//name professor/date.extenction
+	@Column(name="serverFile")
 	@NotNull @NotBlank
-	@Size(max = 40)
-	private String content;
+	@Size(max = 100)
+	private String serverFile;
 
 	public Long getId() {
 		return id;
@@ -36,20 +39,20 @@ public class Material {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getRealName() {
+		return realName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setRealName(String realName) {
+		this.realName = realName;
 	}
 
-	public String getContent() {
-		return content;
+	public String getServerFile() {
+		return serverFile;
 	}
 
-	public void setContent(String content) {
-		this.content = content;
+	public void setServerFile(String serverFile) {
+		this.serverFile = serverFile;
 	}
 	
 }

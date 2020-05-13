@@ -13,8 +13,8 @@ import it.cgm.planner.repository.UserProfessorRepository;
 import it.cgm.planner.repository.UserRepository;
 import it.cgm.planner.repository.UserStudentRepository;
 import it.cgm.planner.security.JwtTokenProvider;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -29,12 +29,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
+import java.io.File;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
@@ -127,12 +127,22 @@ public class AuthController {
 			  return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 		        		HttpStatus.OK.value(), null, "User registered successfully", request.getRequestURI()), HttpStatus.OK);
         }
+        
         if(signUpRequest.getRoleName().name() == "ROLE_PROFESSOR") {
         	UserProfessor userProfessor = new UserProfessor(signUpRequest.getName(), signUpRequest.getLastname(), username);
 			//save the user in UserStudent entity
 			userProfessorRepository.saveAndFlush(userProfessor);
+			
+			 File file = new File("/home/edoardo/Documenti/professorMaterial/"+username);
+			  
+		        if (!file.exists()) {
+		        	
+		            file.mkdirs();            
+		        }
+		        
 			  return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
-		        		HttpStatus.OK.value(), null, "User registered successfully", request.getRequestURI()), HttpStatus.OK);
+		        		HttpStatus.OK.value(), null, "User registered successfully", request.getRequestURI()), HttpStatus.OK);	  
+			 
         }
         
         return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 

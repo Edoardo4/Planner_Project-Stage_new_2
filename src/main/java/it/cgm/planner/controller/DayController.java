@@ -2,14 +2,12 @@ package it.cgm.planner.controller;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.hibernate.mapping.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +23,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import it.cgm.planner.model.Day;
-import it.cgm.planner.model.Group;
 import it.cgm.planner.model.Hour;
-import it.cgm.planner.model.Week;
 import it.cgm.planner.payload.ApiResponse;
 import it.cgm.planner.payload.DayRequest;
-import it.cgm.planner.payload.GroupRequest;
 import it.cgm.planner.repository.DayRepository;
 import it.cgm.planner.repository.HourRepository;
 
@@ -115,7 +110,7 @@ public class DayController {
 		List<Long> hours = dayRequest.getIdHours();
 		
 		//check if day exist
-		 if(days.isEmpty()) {
+		 if(!days.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "Days don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
@@ -123,7 +118,7 @@ public class DayController {
 			
 			Optional<Hour> hour = hourRepository.findById(id);
 			
-			if(hour.isPresent()) {				
+			if(!hour.isPresent()) {				
 				days.get().setHourAdd(hour.get());
 			}
 		}
@@ -146,7 +141,7 @@ public class DayController {
 		Optional<Day> days = dayRepository.findById(dayRequest.getIdDay());
 		
 		//check if day exist
-		 if(days.isEmpty()) {
+		 if(!days.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "Days don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }

@@ -1,7 +1,13 @@
 package it.cgm.planner.controller;
 
+import java.io.IOException;
+import java.net.http.HttpHeaders;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +16,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,15 +27,23 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.sun.istack.Nullable;
 
 import it.cgm.planner.model.Argument;
 import it.cgm.planner.model.Material;
+import it.cgm.planner.model.UserProfessor;
 import it.cgm.planner.payload.ApiResponse;
 import it.cgm.planner.payload.MaterialRequest;
 import it.cgm.planner.repository.ArgumentRepository;
 import it.cgm.planner.repository.MaterialRepository;
+import it.cgm.planner.repository.UserProfessorRepository;
+import it.cgm.planner.security.CurrentUser;
+import it.cgm.planner.security.UserPrincipal;
 
 @RestController
 @RequestMapping("/material")
@@ -38,6 +54,9 @@ public class MaterialController {
 	
 	@Autowired
 	private ArgumentRepository argumentRepository;
+	
+	@Autowired
+	private UserProfessorRepository userProfessorRepository;
 	
 	//role: admin, professor
 	//get all grades
@@ -66,16 +85,19 @@ public class MaterialController {
 		
 		Optional<Argument> argument = argumentRepository.findById(materialRequest.getIdArgument());
 		//check if userStudent exist
-		 if(argument.isEmpty()) {
+		 if(!argument.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "Argument don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
 	
 		Material material = new Material();
+		
 		//set name for a material
-		material.setName(materialRequest.getNameMaterial());
-		//set content for a material
-		material.setContent(materialRequest.getContent());
+		material.setRealName(materialRequest.getRealName());
+		
+		//il file viene caricato nel mio pc, nel db viene inserito una stringa con il path del file 
+		//path del file
+		material.setServerFile(materialRequest.getServerFile());
 		
 		materialRepository.save(material);
 		
@@ -86,7 +108,96 @@ public class MaterialController {
 		 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        		HttpStatus.OK.value(), null, "Material successfully", request.getRequestURI()), HttpStatus.OK);	
 		 }
+   
+    @PostMapping("/upload")
+    //@PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
+    public ResponseEntity<ApiResponse> uploadFile(@RequestParam(value = "file") MultipartFile uploadfile,@RequestParam(value = "idArgument") Long id, HttpServletRequest request,@CurrentUser UserPrincipal currentUser) {
+        //Save the uploaded file to this folder
+      String UPLOADED_FOLDER = "/home/edoardo/Documenti/professorMaterial/";
+        // 3.1.1 Single file upload
+    	    	
+    	Optional<Argument> argument = argumentRepository.findById(id);
+		//check if userStudent exist
+		 if(!argument.isPresent()) {
+			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+	        			HttpStatus.BAD_REQUEST.value(), null, "Argument don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
+		 }
 		
+		if (uploadfile.isEmpty()) {
+        	 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+	        			HttpStatus.BAD_REQUEST.value(), null, "please select a file!", request.getRequestURI()), HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+        	List<MultipartFile> files = Arrays.asList(uploadfile);
+        
+            for (MultipartFile file : files) {
+
+                if (file.isEmpty()) {
+                    continue; //next pls
+                }
+
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get(UPLOADED_FOLDER +currentUser.getUsername()+"/"+file.getOriginalFilename());
+               Files.write(path,bytes);
+            //saveUploadedFiles(Arrays.asList(uploadfile), currentUser);
+             Material material = new Material();
+       		
+       		//set name for a material
+       		material.setRealName(file.getOriginalFilename());
+       		
+       		//il file viene caricato nel mio pc, nel db viene inserito una stringa con il path del file 
+       		//path del file
+       		material.setServerFile(path.toString());
+       		
+       		materialRepository.save(material);
+       		
+       		//add a material created in a set of material in to argument
+       		argument.get().setMaterialAdd(material);
+       		argumentRepository.save(argument.get());
+            } 
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+        		HttpStatus.OK.value(), null, "Material successfully", request.getRequestURI()), HttpStatus.OK);	
+
+    }
+    
+    @DeleteMapping("/delete")
+   // @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
+    public ResponseEntity<ApiResponse> deleteFile(HttpServletRequest request,@CurrentUser UserPrincipal currentUser,@RequestParam(value = "idMaterial") Long idMaterial, @RequestParam(value = "idArgument") Long idArgument) {
+    
+    	Optional<UserProfessor> userProfessor = userProfessorRepository.findByUsername(currentUser.getUsername());
+    	Set<Argument> argumentUserProfessor = userProfessor.get().getArguments();
+    	
+    	for(Argument a: argumentUserProfessor) {
+    		if( a.getId() == idArgument) {
+    			for(Material m : a.getMaterials()) {
+    				
+    				if(m.getId() == idMaterial) {
+    				Path path = Paths.get(m.getServerFile());
+    				try {
+        				Files.delete(path);
+    				}catch (IOException e) {
+    					return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+    		        			HttpStatus.BAD_REQUEST.value(), null, "file not deleted", request.getRequestURI()), HttpStatus.BAD_REQUEST);    
+    					}
+    				a.setMaterialDel(m);
+    				argumentRepository.save(a);
+    				    				
+    				}
+    			}
+    		}
+
+    	}
+		materialRepository.deleteById(idMaterial);
+
+        return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+        		HttpStatus.OK.value(), null, "Material deleted", request.getRequestURI()), HttpStatus.OK);	
+    }
+    
 	//role: admin, user
 	//delete a one material
 	@DeleteMapping("/deleteMaterialInArgument")
@@ -96,7 +207,7 @@ public class MaterialController {
 
 		Optional<Argument> argument = argumentRepository.findById(materialRequest.getIdArgument());
 		//check if userStudent exist
-		 if(argument.isEmpty()) {
+		 if(!argument.isPresent()) {
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        			HttpStatus.BAD_REQUEST.value(), null, "Argument don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 		 }
@@ -124,7 +235,7 @@ public class MaterialController {
 					
 			Optional<Argument> argument = argumentRepository.findById(materialRequest.getIdArgument());
 			//check if userStudent exist
-			 if(argument.isEmpty()) {
+			 if(!argument.isPresent()) {
 				 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 		        			HttpStatus.BAD_REQUEST.value(), null, "Argument don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
 			 }
@@ -151,7 +262,7 @@ public class MaterialController {
 			argumentRepository.save(argument.get());
 			//delete all materials in the set
 			for(Material m : materialsToDelete) {
-				materialRepository.delete(m);
+				materialRepository.deleteById(m.getId());
 			}		 
 			
 			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 

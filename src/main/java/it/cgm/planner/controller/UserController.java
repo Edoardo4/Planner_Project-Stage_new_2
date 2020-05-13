@@ -18,9 +18,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -150,7 +152,7 @@ public class UserController {
         
         //get a role 
         role = roleRepository.findByName(roleName);
-        if(role.isEmpty()) {
+        if(!role.isPresent()) {
         	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
         			HttpStatus.BAD_REQUEST.value(), null, "role don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
         }
@@ -209,5 +211,47 @@ public class UserController {
     	  
     }
 
+	
+	//role: admin, user
+	//delete a one material
+	@DeleteMapping("/deleteUser/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<ApiResponse> deleteUserProfessor(@PathVariable Long id, HttpServletRequest request) {
+
+		Optional<User> user = userRepository.findById(id);
+		
+		List<UserProfessor> usersProfessor = userProfessorRepository.findAll();
+		List<UserStudent> usersStudent = userStudentRepository.findAll();
+
+		if(!user.isEmpty()) {
+			
+			for(UserProfessor up: usersProfessor) {
+				if(up.getUsername().equals(user.get().getUsername()) ) {
+					
+					userProfessorRepository.delete(up);
+					
+				}
+			}for(UserStudent us : usersStudent){
+					if(us.getUsername().equals(user.get().getUsername())){
+				    	String error = "prima eliminare lo studente dalle classe appartenente";
+						try {
+							userStudentRepository.delete(us);
+				    	} catch (Exception e) {
+				    		
+				    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error, us, request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
+				    	}
+					}	
+				}
+			
+			userRepository.delete(user.get());
+
+			 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+		        		HttpStatus.OK.value(), null, "user deleted", request.getRequestURI()), HttpStatus.OK);	
+		}else {
+			return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+        			HttpStatus.BAD_REQUEST.value(), null, "user don't exist", request.getRequestURI()), HttpStatus.BAD_REQUEST);
+		}
+		
+		 }
 
 }

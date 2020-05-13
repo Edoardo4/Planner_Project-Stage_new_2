@@ -10,4 +10,5 @@ public interface UserProfessorRepository extends JpaRepository<UserProfessor, Lo
 
     Optional<UserProfessor> findByUsername(String username);
 
+    
 }
