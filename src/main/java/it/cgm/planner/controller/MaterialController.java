@@ -170,8 +170,9 @@ public class MaterialController {
     public ResponseEntity<ApiResponse> deleteFile(HttpServletRequest request,@CurrentUser UserPrincipal currentUser,@RequestParam(value = "idMaterial") Long idMaterial, @RequestParam(value = "idArgument") Long idArgument) {
     
     	Optional<UserProfessor> userProfessor = userProfessorRepository.findByUsername(currentUser.getUsername());
+		 
     	Set<Argument> argumentUserProfessor = userProfessor.get().getArguments();
-    	
+    
     	for(Argument a: argumentUserProfessor) {
     		if( a.getId() == idArgument) {
     			for(Material m : a.getMaterials()) {
