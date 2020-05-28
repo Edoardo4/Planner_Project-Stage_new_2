@@ -24,11 +24,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,8 +40,9 @@ import java.io.File;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
-@RestController
+@Controller
 @RequestMapping("/api/auth")
 public class AuthController {
 
@@ -65,24 +68,52 @@ public class AuthController {
     JwtTokenProvider tokenProvider;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public String authenticateUser(@Valid @RequestParam(value = "username") String username, @RequestParam(value = "password") String password
+    		/*@RequestBody LoginRequest loginRequest*/) {
 
-    	Optional<User> u = userRepository.findByEmail(loginRequest.getUsername());
+    	Optional<User> u = userRepository.findByEmail(/*loginRequest.getUsername()*/username);
     	
+    	if(!u.isPresent()) {
+      	   
+             return "error/403";
+         }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         //loginRequest.getUsername(),
                 		u.get().getUsername(),
-                        loginRequest.getPassword()
+                		password                       /*loginRequest.getPassword()*/
+
                 )
         );
         
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = tokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+        
+        Set<Role> role= u.get().getRoles();
+       for(Role r: role) {
+    	   
+    	   if(r.getName().name() == "ROLE_ADMIN") {
+    		   return "admin";
+    	   }
+    	   else if(r.getName().name() == "ROLE_STUDENT") {
+    		   
+               return "student";
+
+    	   }
+    	   else if(r.getName().name() == "ROLE_PROFESSOR") {
+	    		   
+	               return "professor";
+       }
+       }
+	return jwt;
+      
+        //return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
+    /*
+     *  
+     * */
 	@PostMapping("/signup")
     public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody SignUpRequest signUpRequest, HttpServletRequest request) {
     	

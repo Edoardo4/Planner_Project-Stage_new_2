@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,11 +23,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import it.cgm.planner.model.Greeting;
 import it.cgm.planner.model.Room;
 import it.cgm.planner.payload.ApiResponse;
 import it.cgm.planner.repository.RoomRepository;
 
-@RestController
+@Controller
 @RequestMapping("/room")
 public class RoomController {
 	
@@ -35,7 +38,7 @@ public class RoomController {
 	//role: admin, user
 	//get all groups
 	@GetMapping("/findAll")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
 	@ResponseBody
 	public ResponseEntity<ApiResponse> findAllGroups(HttpServletRequest request) {	
 
@@ -50,7 +53,16 @@ public class RoomController {
 		}
 		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, list, request.getRequestURI()), HttpStatus.OK);
 	}
-	
+
+	@RequestMapping("all")
+	public String getAllRoom(Model model) {
+		
+		List<Room> rooms = roomRepository.findAll();
+		
+		model.addAttribute("rooms", rooms);
+		
+		return "allRoom"; 
+	}
 
 	//role: admin, user
 	//get group by id

@@ -10,7 +10,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +34,6 @@ import it.cgm.planner.repository.ArgumentRepository;
 import it.cgm.planner.repository.ExamRepository;
 import it.cgm.planner.repository.GroupRepository;
 import it.cgm.planner.repository.UserProfessorRepository;
-import it.cgm.planner.repository.UserRepository;
 
 @RestController
 @RequestMapping("/userProfessor")
@@ -53,8 +51,7 @@ public class UserProfessorController {
 	@Autowired
 	private ExamRepository examRepository;
 	
-	@Autowired
-	private UserRepository userRepository;
+	
 	
 	//get all user students
     @GetMapping("/findAll")

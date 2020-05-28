@@ -10,6 +10,8 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlRootElement;
+
 
 @Entity
 @Table(name = "room", uniqueConstraints = {
@@ -30,7 +32,7 @@ public class Room {
 	
 	@Column(name = "is_valid", nullable = false, columnDefinition = "tinyint(1)")
 	private boolean isValid = true;
-
+	
 	public Long getId() {
 		return id;
 	}
@@ -54,6 +56,7 @@ public class Room {
 	public void setValid(boolean isValid) {
 		this.isValid = isValid;
 	}
+	
 	
 	
 }

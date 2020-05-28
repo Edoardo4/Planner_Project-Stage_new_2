@@ -1,7 +1,10 @@
 package it.cgm.planner.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.http.HttpHeaders;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,13 +16,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,9 +37,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.sun.istack.Nullable;
 
 import it.cgm.planner.model.Argument;
 import it.cgm.planner.model.Material;
@@ -43,6 +49,7 @@ import it.cgm.planner.repository.ArgumentRepository;
 import it.cgm.planner.repository.MaterialRepository;
 import it.cgm.planner.repository.UserProfessorRepository;
 import it.cgm.planner.security.CurrentUser;
+import it.cgm.planner.security.MediaTypeUtils;
 import it.cgm.planner.security.UserPrincipal;
 
 @RestController
@@ -80,7 +87,7 @@ public class MaterialController {
 	//role: admin, user
 	//insert a material
 	@PostMapping("/insertMaterialInArgument")
-    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR')")
 	public ResponseEntity<ApiResponse> insertGradeInUserSudent(@Valid @RequestBody MaterialRequest materialRequest,HttpServletRequest request) {
 		
 		Optional<Argument> argument = argumentRepository.findById(materialRequest.getIdArgument());
@@ -110,8 +117,8 @@ public class MaterialController {
 		 }
    
     @PostMapping("/upload")
-    //@PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
-    public ResponseEntity<ApiResponse> uploadFile(@RequestParam(value = "file") MultipartFile uploadfile,@RequestParam(value = "idArgument") Long id, HttpServletRequest request,@CurrentUser UserPrincipal currentUser) {
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR')")
+    public ResponseEntity<ApiResponse> uploadFile(@RequestParam(value = "file") MultipartFile uploadfile,@RequestParam(value = "idArgument") Long id, HttpServletRequest request,@CurrentUser UserPrincipal currentUser) throws MaxUploadSizeExceededException {
         //Save the uploaded file to this folder
       String UPLOADED_FOLDER = "/home/edoardo/Documenti/professorMaterial/";
         // 3.1.1 Single file upload
@@ -136,7 +143,11 @@ public class MaterialController {
                 if (file.isEmpty()) {
                     continue; //next pls
                 }
-
+               if(file.getOriginalFilename().contains(" ")) {
+            	   return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+   	        			HttpStatus.BAD_REQUEST.value(), null, "please, change file name, the name must not have empty spaces", request.getRequestURI()), HttpStatus.BAD_REQUEST);
+               }
+            	   
                 byte[] bytes = file.getBytes();
                 Path path = Paths.get(UPLOADED_FOLDER +currentUser.getUsername()+"/"+file.getOriginalFilename());
                Files.write(path,bytes);
@@ -164,6 +175,31 @@ public class MaterialController {
         		HttpStatus.OK.value(), null, "Material successfully", request.getRequestURI()), HttpStatus.OK);	
 
     }
+   
+   @Autowired
+   private ServletContext servletContext;
+   @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR')")
+   @GetMapping("/dowload1")
+   public ResponseEntity<InputStreamResource> downloadFile(@RequestParam(value = "idMaterial") Long id) throws IOException {
+   	
+	   Optional<Material> material = materialRepository.findById(id);
+	   
+       MediaType mediaType = MediaTypeUtils.getMediaTypeForFileName(this.servletContext, material.get().getRealName());
+
+	   File file = new File(material.get().getServerFile());
+	   
+	   InputStreamResource resource = new InputStreamResource(new FileInputStream(file));       
+       
+       return ResponseEntity.ok()
+               // Content-Disposition
+               .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
+               // Content-Type
+               .contentType(mediaType)
+               // Contet-Length
+               .contentLength(file.length()) //
+               
+               .body(resource);
+   }
     
     @DeleteMapping("/delete")
    // @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
