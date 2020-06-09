@@ -5,24 +5,12 @@
 <head>
 </head>
 <body>
-<div th:fragment="footer">
-
-    <div class="container">
-
-        <footer>
-        <!-- this is footer -->
-            <span sec:authorize="isAuthenticated()">
-                | Logged user: <span sec:authentication="name"></span> |
-                Roles: <span sec:authentication="principal.authorities"></span> |
-                <a th:href="@{/logout}">Sign Out</a>
-            </span>
-
-        <script type="text/javascript"
-                src="webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-        </footer>
+    <!-- /*  Multiple fragments may be defined in one file */-->
+    <div th:fragment="footer">
+      &copy; 2016 Footer
     </div>
-
-</div>
+    <div th:fragment="footer-admin">
+      &copy; 2016 Admin Footer
+    </div>
 </body>
 </html>

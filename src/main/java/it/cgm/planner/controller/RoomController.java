@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import it.cgm.planner.model.Greeting;
 import it.cgm.planner.model.Room;
 import it.cgm.planner.payload.ApiResponse;
 import it.cgm.planner.repository.RoomRepository;
@@ -63,7 +62,12 @@ public class RoomController {
 		
 		return "allRoom"; 
 	}
-
+	
+	@GetMapping("/styled-page")
+	public String getStyledPage(Model model) {
+	    model.addAttribute("name", "Baeldung Reader");
+	    return "cssandjs/styledPage";
+	}
 	//role: admin, user
 	//get group by id
 	@GetMapping("/byId/{id}")

@@ -1,11 +1,22 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+
+    <title>Spring Security Example </title>
     <div th:replace="fragments/header :: header-css"/>
-</head>
+     <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  
+        <link rel="stylesheet" type="text/css" href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" /></head>
+
+<script type="text/javascript" th:src="@{/js/cssandjs/action.js}"></script>
 <body>
 
 <div th:replace="fragments/header :: header"/>
+
 
 <div class="container">
 
@@ -16,10 +27,35 @@
         <form th:action="@{/logout}" method="post">
             <input type="submit" value="Sign Out"/>
         </form>
-
+		<span th:text="${jwt}"> jwt </span>
     </div>
-
+        
 </div>
+	  <script th:inline="javascript">
+
+		      $.ajax({
+		    	   url: 'http://localhost:8080/room/all',
+		    	   type: 'GET',
+		    	   contentType: 'application/json'
+		    	   headers: {
+		    	      'Authorization': 'Bearer <${jwt}>'
+		    	   },
+		    	   success: function (result) {
+		    	       // CallBack(result);
+		    	   },
+		    	   error: function (error) {
+		
+		    	   }
+		    	});		
+				</script>
+	<form th:action="@{/room/all}" method="get" > 
+			  <h1>Rooms</h1>
+		   
+		
+    
+				<input type="submit" value="show room"/>
+              </form>
+          
 <!-- /.container -->
 <div th:replace="fragments/footer :: footer"/>
 
