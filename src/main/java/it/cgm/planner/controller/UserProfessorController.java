@@ -55,7 +55,7 @@ public class UserProfessorController {
 	
 	//get all user students
     @GetMapping("/findAll")
-    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
+    @PreAuthorize("hasRole('ADMIN') or harRole('STUDENT')")
     public ResponseEntity<ApiResponse> getAllUsersProfessor(HttpServletRequest request) {
     	
     	String error = null;
@@ -65,10 +65,13 @@ public class UserProfessorController {
     		userProfessorList = userProfessorRepository.findAll();
     	} catch (Exception e) {
     		error = e.getMessage();
-    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error, userProfessorList, request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
+    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+    				HttpStatus.INTERNAL_SERVER_ERROR.value(), error, userProfessorList,
+    				request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
     	}
         
-    	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, userProfessorList, request.getRequestURI()), HttpStatus.OK);
+    	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(),
+    			error, userProfessorList, request.getRequestURI()), HttpStatus.OK);
     }
     
     //get user whit username
@@ -90,8 +93,9 @@ public class UserProfessorController {
     
     //get all group
     @GetMapping("/allGroup")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse> getGroup(@Valid @RequestBody UserProfessorRequest userProfessorRequest, HttpServletRequest request) {
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
+    public ResponseEntity<ApiResponse> getGroup(@Valid @RequestBody
+    		UserProfessorRequest userProfessorRequest, HttpServletRequest request) {
     	String error = null;
     	
     	Optional<UserProfessor> userProfessor;
@@ -106,15 +110,19 @@ public class UserProfessorController {
          
     	}catch (Exception e) {
     		error = e.getMessage();
-    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error, groups,  request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
+    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+    				HttpStatus.INTERNAL_SERVER_ERROR.value(), error, groups,  request.getRequestURI()),
+    				HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-    	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, groups, request.getRequestURI()), HttpStatus.OK);
+    	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(),
+    			HttpStatus.OK.value(), error, groups, request.getRequestURI()), HttpStatus.OK);
     }
     
     //get all argument
     @GetMapping("/allArgument")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse> getArgument(@Valid @RequestBody UserProfessorRequest userProfessorRequest, HttpServletRequest request) {
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
+    public ResponseEntity<ApiResponse> getArgument(@Valid @RequestBody UserProfessorRequest userProfessorRequest,
+    		HttpServletRequest request) {
     	String error = null;
     	
     	Optional<UserProfessor> userProfessor;
@@ -129,15 +137,19 @@ public class UserProfessorController {
          
     	}catch (Exception e) {
     		error = e.getMessage();
-    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error, argument,  request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
+    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+    				HttpStatus.INTERNAL_SERVER_ERROR.value(), error, argument,  request.getRequestURI()),
+    				HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-    	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, argument, request.getRequestURI()), HttpStatus.OK);
+    	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(),
+    			HttpStatus.OK.value(), error, argument, request.getRequestURI()), HttpStatus.OK);
     }
     
     //get all exam
     @GetMapping("/allExam")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse> getExam(@Valid @RequestBody UserProfessorRequest userProfessorRequest, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse> getExam(@Valid @RequestBody UserProfessorRequest userProfessorRequest,
+    		HttpServletRequest request) {
     	String error = null;
     	
     	Optional<UserProfessor> userProfessor;
@@ -152,9 +164,12 @@ public class UserProfessorController {
          
     	}catch (Exception e) {
     		error = e.getMessage();
-    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error, exam,  request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
+    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+    				HttpStatus.INTERNAL_SERVER_ERROR.value(), error, exam,  request.getRequestURI()),
+    				HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-    	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, exam, request.getRequestURI()), HttpStatus.OK);
+    	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+    			HttpStatus.OK.value(), error, exam, request.getRequestURI()), HttpStatus.OK);
     }
     
     
@@ -217,9 +232,6 @@ public class UserProfessorController {
 		 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        		HttpStatus.OK.value(), null, "Group in User Professor deleted", request.getRequestURI()), HttpStatus.OK);	
 		 }
-    
-	
-	
 	
 	
 	//role: admin, user
@@ -275,10 +287,6 @@ public class UserProfessorController {
 		 return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
 	        		HttpStatus.OK.value(), null, "argument in User Professor deleted", request.getRequestURI()), HttpStatus.OK);	
 		 }
-	
-	
-	
-	
 	
 	
 	//role: admin, user

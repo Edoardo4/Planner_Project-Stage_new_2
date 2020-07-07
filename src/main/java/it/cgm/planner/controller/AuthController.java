@@ -68,23 +68,22 @@ public class AuthController {
     @Autowired
     JwtTokenProvider tokenProvider;
 
-    @PostMapping("/signin")
-    public String authenticateUser(@Valid @RequestParam(value = "username") String username, @RequestParam(value = "password") String password
-    		/*@RequestBody LoginRequest loginRequest*/,HttpServletRequest request, Model model) {
+   /* @PostMapping("/signin")
+    public ResponseEntity<JwtAuthenticationResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest,HttpServletRequest request) {
 
-    	HttpServletRequest req = request;
-    	Optional<User> user= userRepository.findByEmail(/*loginRequest.getUsername()*/username);
+    	Optional<User> user= userRepository.findByEmail(loginRequest.getUsername());
     	    	 
-    		if(!user.isPresent()) {
+    		/*if(!user.isPresent()) {
     			return "error/403";
-    		}
+    		}*/
     		
-    	try {
+   /* 	try {
     		 Authentication authentication = authenticationManager.authenticate(
     	                new UsernamePasswordAuthenticationToken(
-    	                        //loginRequest.getUsername(),
-    	                		user.get().getUsername(),
-    	                		password                    //loginRequest.getPassword()
+    	                        loginRequest.getUsername(),
+    	                        loginRequest.getPassword()
+    	                		//user.get().getUsername(),
+    	                		//password                    
 
     	                )
     	        );
@@ -92,10 +91,12 @@ public class AuthController {
     		 
     	      String jwt = tokenProvider.generateToken(authentication);
     	       
-    	       Set<Role> role= user.get().getRoles();
+    	      /* Set<Role> role= user.get().getRoles();
     	       for(Role r: role) {
     	    	   
     	    	   if(r.getName().name() == "ROLE_ADMIN") {
+    	    		   
+    	    		   model.addAttribute("jwt", jwt);
 
     	    		   return "admin";
 
@@ -112,17 +113,34 @@ public class AuthController {
     		    		   
     		               return "professor";
     	       }
-    	       }    	       
-    	}catch (Exception e) {
-			return "error/403";
-		}
-        
- 
-	return null;
-      
-        //return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
-    }
+    	      / }  */  	    
+    	       // return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
 
+
+    	//}catch (Exception e) {
+    		
+	//	}
+	//	return null;
+
+   // }*/
+    @PostMapping("/signin")
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+
+    	Optional<User> u = userRepository.findByEmail(loginRequest.getUsername());
+    	
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        //loginRequest.getUsername(),
+                		u.get().getUsername(),
+                        loginRequest.getPassword()
+                )
+        );
+        
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String jwt = tokenProvider.generateToken(authentication);
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+    }
 	@PostMapping("/signup")
     public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody SignUpRequest signUpRequest, HttpServletRequest request) {
     	

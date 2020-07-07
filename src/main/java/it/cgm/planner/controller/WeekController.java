@@ -70,7 +70,7 @@ public class WeekController {
 	//role: admin, user
 	//get all week
 	@GetMapping("/findAll")
-    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR')")
+    @PreAuthorize("hasRole('ADMIN') or harRole('PROFESSOR') or harRole('STUDENT')")
 	@ResponseBody
 	public ResponseEntity<ApiResponse> findAllWeeks(HttpServletRequest request) {	
 
@@ -82,9 +82,12 @@ public class WeekController {
 			
 		}catch (Exception e) {
 			error = e.getMessage();
-    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error, list,  request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
+    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), 
+    				HttpStatus.INTERNAL_SERVER_ERROR.value(), error, list,  request.getRequestURI()),
+    				HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, list, request.getRequestURI()), HttpStatus.OK);
+		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), 
+				error, list, request.getRequestURI()), HttpStatus.OK);
 	}
 	
 	//role: admin, user

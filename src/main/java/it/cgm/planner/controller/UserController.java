@@ -100,8 +100,9 @@ public class UserController {
 
     //get user profile whit username
     @GetMapping("/users/{username}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse> getUserProfile(@PathVariable(value = "username") String username, HttpServletRequest request) {
+    @PreAuthorize("hasRole('STUDENT') or hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse> getUserProfile(@PathVariable(value = "username") String username,
+    		HttpServletRequest request) {
     	String error = null;
     	 UserProfile userProfile = null;
     	try {
@@ -112,9 +113,11 @@ public class UserController {
          userProfile = new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getLastname());
     	}catch (Exception e) {
     		error = e.getMessage();
-    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(), error,userProfile,  request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
+    		return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
+    				error,userProfile,  request.getRequestURI()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-    	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, userProfile, request.getRequestURI()), HttpStatus.OK);
+    	return new ResponseEntity<ApiResponse>(new ApiResponse(Instant.now(), HttpStatus.OK.value(), error, userProfile, 
+    			request.getRequestURI()), HttpStatus.OK);
         
     }
 
